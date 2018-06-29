@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui widgets  printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,12 +24,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
     mainwindowslot.cpp \
-    mainwindowui.cpp
+    mainwindowui.cpp \
+    FindDialog.cpp \
+    #FindDialog.cpp \
+    main.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    FindDialog.h
 
 RESOURCES += \
     res.qrc

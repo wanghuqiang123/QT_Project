@@ -10,6 +10,11 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QString>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QSharedPointer>
+#include "FindDialog.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -18,7 +23,8 @@ private:
     QPlainTextEdit mainedit;
     QLabel statusLbl;
     QString m_filepath;
-
+    bool m_isTextChange;
+    QSharedPointer<FindDialog>m_pfindDialog;
 
     MainWindow();
     MainWindow(const MainWindow&);
@@ -40,8 +46,18 @@ private:
     bool makeAction(QAction*& action,QWidget* parent, QString tip, QString icon);
 
     //member function
+    int showQueryMessage(QString Message);
     QString showFileDialog(QFileDialog::AcceptMode mode,QString title);
     void showErroeMessage(const QString message);
+    QString saveCurrentData(QString path = "");
+    void preEditorChange();
+    void openFileToEditor(QString path);
+    QAction* findMenuBarAction(QString text);
+    QAction* findToolBarAction(QString text);
+protected:
+    void closeEvent(QCloseEvent *);
+    void dragEnterEvent(QDragEnterEvent *e);  //悬挂事件
+    void dropEvent(QDropEvent *e);    //放下事件
 public:
     static MainWindow* NewInstance();
     ~MainWindow();
@@ -49,6 +65,16 @@ private slots:
     void onFileOpen();
     void onFileSave();
     void onFileSaveAs();
+    void onTextChanged();
+    void onFileNew();
+    void onFilePrint();
+    void onCopyAvailable(bool available);
+    void onRedoAvailable(bool available);
+    void onUndoAvailable(bool available);
+    void onCursorPositiongChanged();
+    void onEditDelete();
+    void onFileExit();
+    void onEditFind();
 };
 
 #endif // MAINWINDOW_H
