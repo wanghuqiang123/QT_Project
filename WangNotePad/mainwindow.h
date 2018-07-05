@@ -14,6 +14,7 @@
 #include <QDropEvent>
 #include <QSharedPointer>
 #include "FindDialog.h"
+#include "ReplaceDialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -25,6 +26,7 @@ private:
     QString m_filepath;
     bool m_isTextChange;
     QSharedPointer<FindDialog>m_pfindDialog;
+    QSharedPointer<ReplaceDialog>m_pReplaceDlg;
 
     MainWindow();
     MainWindow(const MainWindow&);
@@ -75,6 +77,15 @@ private slots:
     void onEditDelete();
     void onFileExit();
     void onEditFind();
+    void onReplace();
+    void onBackStyleSet();
+    void onEditGoto();
+    void onViewToolbar();
+    void onViewStatusbar();
+    void onHelpAbout();
+    void onFormatFont();
+    void onFormatWrap();
+    void onHelpManual();
 };
 
 #endif // MAINWINDOW_H

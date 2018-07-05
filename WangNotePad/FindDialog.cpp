@@ -90,7 +90,7 @@ void FindDialog::onFindClickd()
         }
 
         if(m_backwardBtn.isChecked())
-        {
+        {     //从末尾开始查找
             index = text.lastIndexOf(target,c.position()-text.length()-1,m_matchChkBx.isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive);
             if(index>=0)
             {

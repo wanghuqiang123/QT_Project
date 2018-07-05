@@ -27,12 +27,15 @@ SOURCES += \
     mainwindowslot.cpp \
     mainwindowui.cpp \
     FindDialog.cpp \
-    #FindDialog.cpp \
-    main.cpp
+    main.cpp \
+    ReplaceDialog.cpp \
+    AboutDialog.cpp
 
 HEADERS += \
         mainwindow.h \
-    FindDialog.h
+    FindDialog.h \
+    ReplaceDialog.h \
+    AboutDialog.h
 
 RESOURCES += \
     res.qrc

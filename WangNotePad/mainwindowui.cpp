@@ -4,8 +4,9 @@
 #include <QSize>
 #include <QStatusBar>
 #include <QLabel>
+#include <QPalette>
 
-MainWindow::MainWindow() : m_pfindDialog(new FindDialog(this,&mainedit))
+MainWindow::MainWindow() : m_pfindDialog(new FindDialog(this,&mainedit)),m_pReplaceDlg(new ReplaceDialog(this,&mainedit))
 {
     m_filepath = "";
     m_isTextChange = false;
@@ -89,6 +90,13 @@ bool MainWindow::initStatusBar()    //底部状态栏的设置
 bool MainWindow::initMainEditor()
 {
     bool ret = true;
+
+    QPalette p = mainedit.palette();
+    //设置被选取的字符的颜色  第三个参数表示选取高亮行的被激活后的颜色
+    p.setColor(QPalette::Inactive,QPalette::Highlight,p.color(QPalette::Active,QPalette::Highlight));
+    p.setColor(QPalette::Inactive,QPalette::HighlightedText,p.color(QPalette::Active,QPalette::HighlightedText));
+
+    mainedit.setPalette(p);
     mainedit.setParent(this);
 
     connect(&mainedit,SIGNAL(textChanged()),this,SLOT(onTextChanged()));  //当文本编辑器内容发生变化时  触发信号 对应到槽函数去
@@ -246,12 +254,14 @@ bool MainWindow::initEditMenu(QMenuBar *mb)
         ret = ret && makeAction(action,menu, "Replace",Qt::CTRL + Qt::Key_H);
         if(ret)
         {
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onReplace()));
             menu->addAction(action);
         }
 
         ret = ret && makeAction(action,menu, "Goto",Qt::CTRL + Qt::Key_G);
         if(ret)
         {
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onEditGoto()));
             menu->addAction(action);
         }
 
@@ -285,12 +295,16 @@ bool MainWindow::initFormatMenu(QMenuBar* mb)
         ret = ret && makeAction(action,menu, "Auto Warp(W)",0);
         if(ret)
         {
+            action->setCheckable(true);      //设置这个action对象性质是可选择的
+            action->setChecked(false);  //默认是未选择的
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onFormatWrap()));
             menu->addAction(action);
         }
 
         ret = ret && makeAction(action,menu, "Font",0);
         if(ret)
         {
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onFormatFont()));
             menu->addAction(action);
         }
     }
@@ -316,12 +330,19 @@ bool MainWindow::initViewMenu(QMenuBar* mb)
         ret = ret && makeAction(action,menu, "Tool Bar",0);
         if(ret)
         {
+
+            action->setCheckable(true);
+            action->setChecked(true);
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onViewToolbar()));
             menu->addAction(action);
         }
 
         ret = ret && makeAction(action,menu, "Status Bar",0);
         if(ret)
         {
+            action->setCheckable(true);
+            action->setChecked(true);
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onViewStatusbar()));
             menu->addAction(action);
         }
     }
@@ -348,12 +369,14 @@ bool MainWindow::initHelpMenu(QMenuBar* mb)
         ret = ret && makeAction(action,menu, "User Manual",0);
         if(ret)
         {
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onHelpManual()));
             menu->addAction(action);
         }
 
         ret = ret && makeAction(action,menu, "About NotePad",0);
         if(ret)
         {
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onHelpAbout()));
             menu->addAction(action);
         }
     }
@@ -379,6 +402,13 @@ bool MainWindow::initSetMenu(QMenuBar *mb)
         QAction* action = NULL;
 
         ret = ret && makeAction(action,menu, "Language Format Set",0);
+        if(ret)
+        {
+            menu->addAction(action);
+        }
+
+        menu->addSeparator();
+        ret = ret && makeAction(action,menu,"Black style Set",0);
         if(ret)
         {
             menu->addAction(action);
@@ -517,20 +547,18 @@ bool MainWindow::initFileToolItem(QToolBar* tb)
     ret = ret && makeAction(action,tb,"Replace",":/res/pic/replace");
     if(ret)
     {
+        connect(action,SIGNAL(triggered(bool)),this,SLOT(onReplace()));
         tb->addAction(action);
     }
 
     tb->addSeparator();
 
-    ret = ret && makeAction(action,tb,"Tool",":/res/pic/tool");
+    ret = ret && makeAction(action,tb,"Status Bar",":/res/pic/status");
     if(ret)
     {
-        tb->addAction(action);
-    }
-
-    ret = ret && makeAction(action,tb,"Status",":/res/pic/status");
-    if(ret)
-    {
+        action->setCheckable(true);
+        action->setChecked(true);
+        connect(action,SIGNAL(triggered(bool)),this,SLOT(onViewStatusbar()));
         tb->addAction(action);
     }
 
@@ -539,18 +567,23 @@ bool MainWindow::initFileToolItem(QToolBar* tb)
     ret = ret && makeAction(action,tb,"Font",":/res/pic/font");
     if(ret)
     {
+        connect(action,SIGNAL(triggered(bool)),this,SLOT(onFormatFont()));
         tb->addAction(action);
     }
 
     ret = ret && makeAction(action,tb,"Goto",":/res/pic/goto");
     if(ret)
     {
+        connect(action,SIGNAL(triggered(bool)),this,SLOT(onEditGoto()));
         tb->addAction(action);
     }
 
     ret = ret && makeAction(action,tb,"Wrap",":/res/pic/wrap");
     if(ret)
     {
+        action->setCheckable(true);      //设置这个action对象性质是可选择的
+        action->setChecked(false);  //默认是未选择的
+        connect(action,SIGNAL(triggered(bool)),this,SLOT(onFormatWrap()));
         tb->addAction(action);
     }
 

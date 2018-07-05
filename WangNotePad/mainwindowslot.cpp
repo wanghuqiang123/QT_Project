@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "AboutDialog.h"
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
@@ -17,6 +18,11 @@
 #include <QPrinter>
 #include <QKeyEvent>
 #include <QApplication>
+#include <QInputDialog>
+#include <QStatusBar>
+#include <QToolBar>
+#include <QFontDialog>
+#include <QDesktopServices>
 
 //错误消息提示对话框
 void MainWindow::showErroeMessage(const QString message)
@@ -305,7 +311,7 @@ QAction* MainWindow::findMenuBarAction(QString text)
     }
     return ret;
 }
-QAction* MainWindow::findToolBarAction(QString text)
+QAction* MainWindow::findToolBarAction(QString text)   //列出子类查找与text所一直的标签的action对象  然后返回其指针
 {
     QAction* ret = NULL;
     const QObjectList& list = children();
@@ -386,7 +392,102 @@ void MainWindow::onEditFind()
     m_pfindDialog->show();
 }
 
+void MainWindow::onReplace()
+{
+    m_pReplaceDlg->show();
+}
 
+void MainWindow::onEditGoto()
+{
+    bool ok = false;
+    int ln = QInputDialog::getInt(this,"Goto","Line: ",1,1,mainedit.document()->lineCount(),1,&ok);
+    //从输入对话框中输入获取用户输入的整形值，
+    if(ok)
+    {
+        QString text = mainedit.toPlainText();  //以纯文本形式返回文本编辑的文本。
+        QTextCursor c = mainedit.textCursor();
+        int pos = 0;   //跳转到的位置；
+        int next = -1;
+
+        for(int i = 0;i<ln;i++)
+        {
+            pos = next+1;
+            next = text.indexOf('\n',pos);  //当遇到换行符的时候跳转到下一行
+        }
+
+        c.setPosition(pos);
+        mainedit.setTextCursor(c);   //在主窗口中设置光标
+    }
+}
+
+void MainWindow::onViewToolbar()
+{
+    const QObjectList& list = children();
+    for(int i = 0;i<list.count();i++)
+    {
+        QToolBar* tb = dynamic_cast<QToolBar*>(list[i]);  //将父类指针强制转换为子类指针  如果能转换 则指针不会为空
+        if(tb != NULL)
+        {
+            bool visible = tb->isVisible();
+            tb->setVisible(!visible);          //取反
+            findMenuBarAction("Tool Bar")->setChecked(!visible);  //在菜单栏中取反（打勾表示），
+            break;
+        }
+    }
+}
+void MainWindow::onViewStatusbar()
+{
+     QStatusBar* sb = statusBar();
+     bool visible = sb->isVisible();
+
+     sb->setVisible(!visible);
+
+     findMenuBarAction("Status Bar")->setCheckable(!visible);
+     findToolBarAction("Status Bar")->setCheckable(!visible);
+}
+
+void MainWindow::onHelpAbout()
+{
+    AboutDialog(this).exec();
+}
+
+void MainWindow::onFormatFont()       //设置字体格式大小
+{
+    bool ok = false;
+    QFont font = QFontDialog::getFont(&ok,mainedit.font(),this);
+
+    if(ok)
+    {
+        mainedit.setFont(font);
+    }
+}
+
+void MainWindow::onFormatWrap()   //换行转换
+{
+    QPlainTextEdit::LineWrapMode mode = mainedit.lineWrapMode();
+    if(mode == QPlainTextEdit::NoWrap)
+    {
+        mainedit.setLineWrapMode(QPlainTextEdit::WidgetWidth); //当前输入的字符串长度与窗口长度相同  自动换行
+        findMenuBarAction("Auto Warp(W)")->setChecked(true);
+        findToolBarAction("Wrap")->setChecked(true);
+    }
+    else
+    {
+        mainedit.setLineWrapMode(QPlainTextEdit::NoWrap);
+
+        findMenuBarAction("Auto Warp(W)")->setChecked(false);
+        findToolBarAction("Wrap")->setChecked(false);
+    }
+}
+void MainWindow::onHelpManual()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/wanghuqiang123/QT_Project/tree/master/WangNotePad"));
+}
+
+void MainWindow::onBackStyleSet()
+{
+
+}
 
 
 
