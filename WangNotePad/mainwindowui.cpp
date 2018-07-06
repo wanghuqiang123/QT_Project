@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "AppConfig.h"
 #include <QMenu>
 #include <QIcon>
 #include <QSize>
@@ -30,11 +31,35 @@ MainWindow* MainWindow::NewInstance()
 bool MainWindow::construct()
 {
     bool ret = true;
-
+    AppConfig config;
     ret = ret && initMenuBar();
     ret = ret && initToolBar();
     ret = ret && initStatusBar();
     ret = ret && initMainEditor();
+
+    if(config.isValid())
+    {
+        mainedit.setFont(config.editorFont());  //设置字体
+        if(!config.isAutoWrap())
+        {
+            mainedit.setLineWrapMode(QPlainTextEdit::NoWrap);
+            findMenuBarAction("Auto Warp(W)")->setChecked(false);
+            findToolBarAction("Wrap")->setChecked(false);
+        }
+
+        if(!config.isToolBarVisible())
+        {
+            toolbar()->setVisible(false);
+            findMenuBarAction("Tool Bar")->setChecked(false);
+        }
+
+        if(!config.isStatusBarVisible())
+        {
+            statusBar()->setVisible(false);  //因为状态栏实在Qt中直接调用出来的
+            findMenuBarAction("Status Bar")->setChecked(false);
+            findToolBarAction("Status Bar")->setChecked(false);
+        }
+    }
     return ret;
 }
 
@@ -600,7 +625,42 @@ bool MainWindow::initFileToolItem(QToolBar* tb)
     return ret;
 }
 
+QToolBar* MainWindow::toolbar()  //查找主窗口中的工具栏
+{
+    QToolBar* ret = NULL;
+    const QObjectList& list = children();  //查找主窗口中的子类
+    for(int i = 0;i<list.count();i++)
+    {
+        QToolBar* tb = dynamic_cast<QToolBar*>(list[i]);  //将父类指针强制转换为子类指针  如果能转换 则指针不会为空
+        if(tb != NULL)
+        {
+            ret = tb;
+            break;
+        }
+    }
+
+    return ret;
+}
+
 MainWindow::~MainWindow()
 {
+    QFont font = mainedit.font();
+    bool isWrap = (mainedit.lineWrapMode() == QPlainTextEdit::WidgetWidth);
+    bool tbVisible = (findMenuBarAction("Tool Bar")->isChecked());
+    bool sb = (findMenuBarAction("Status Bar")->isChecked() && findToolBarAction("Status Bar")->isChecked());
+    AppConfig config(font,isWrap,tbVisible,sb);
+
+    config.store();
 
 }
+
+
+
+
+
+
+
+
+
+
+

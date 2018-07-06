@@ -29,13 +29,15 @@ SOURCES += \
     FindDialog.cpp \
     main.cpp \
     ReplaceDialog.cpp \
-    AboutDialog.cpp
+    AboutDialog.cpp \
+    AppConfig.cpp
 
 HEADERS += \
         mainwindow.h \
     FindDialog.h \
     ReplaceDialog.h \
-    AboutDialog.h
+    AboutDialog.h \
+    AppConfig.h
 
 RESOURCES += \
     res.qrc

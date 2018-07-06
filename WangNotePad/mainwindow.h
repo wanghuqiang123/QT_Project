@@ -62,6 +62,7 @@ protected:
     void dropEvent(QDropEvent *e);    //放下事件
 public:
     static MainWindow* NewInstance();
+    QToolBar* toolbar();
     ~MainWindow();
 private slots:
     void onFileOpen();

@@ -311,28 +311,21 @@ QAction* MainWindow::findMenuBarAction(QString text)
     }
     return ret;
 }
-QAction* MainWindow::findToolBarAction(QString text)   //列出子类查找与text所一直的标签的action对象  然后返回其指针
+QAction* MainWindow::findToolBarAction(QString text)   //列出子类查找与text所对应的标签的action对象  然后返回其指针
 {
     QAction* ret = NULL;
-    const QObjectList& list = children();
-    for(int i = 0;i<list.count();i++)
+    QToolBar* toolBar = toolbar();
+    QList<QAction*>actions = toolBar->actions();
+
+    for(int j = 0;j<actions.count();j++)
     {
-        QToolBar* toolBar = dynamic_cast<QToolBar*>(list[i]);
-
-        if(toolBar != NULL)
+        if(actions[j]->toolTip().startsWith(text))
         {
-            QList<QAction*>actions = toolBar->actions();
-
-            for(int j = 0;j<actions.count();j++)
-            {
-                if(actions[j]->toolTip().startsWith(text))
-                {
-                    ret = actions[j];
-                    break;
-                }
-            }
+            ret = actions[j];
+            break;
         }
     }
+
     return ret;
 }
 
@@ -422,18 +415,14 @@ void MainWindow::onEditGoto()
 
 void MainWindow::onViewToolbar()
 {
-    const QObjectList& list = children();
-    for(int i = 0;i<list.count();i++)
-    {
-        QToolBar* tb = dynamic_cast<QToolBar*>(list[i]);  //将父类指针强制转换为子类指针  如果能转换 则指针不会为空
-        if(tb != NULL)
-        {
-            bool visible = tb->isVisible();
-            tb->setVisible(!visible);          //取反
-            findMenuBarAction("Tool Bar")->setChecked(!visible);  //在菜单栏中取反（打勾表示），
-            break;
-        }
-    }
+    QToolBar* tb = toolbar();
+
+    bool visible = tb->isVisible();   //取得工具栏的可见性状态
+
+    tb->setVisible(!visible);          //取反
+
+    findMenuBarAction("Tool Bar")->setChecked(!visible);  //在菜单栏中取反（打勾表示），
+
 }
 void MainWindow::onViewStatusbar()
 {
