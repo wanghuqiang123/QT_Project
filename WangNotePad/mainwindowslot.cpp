@@ -23,6 +23,7 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QFontDialog>
+#include <QBrush>
 #include <QDesktopServices>
 
 //错误消息提示对话框
@@ -497,6 +498,20 @@ void MainWindow::onHelpManual()
 
 void MainWindow::onBackStyleSet()
 {
+
+    QPalette p = mainedit.palette();
+    p.setColor(QPalette::Active,QPalette::Base,Qt::gray);
+    p.setColor(QPalette::Inactive,QPalette::Base,Qt::gray);     //Base用于设置的是窗口小部件的背景色   在这里是高亮行的背景色
+    p.setColor(QPalette::Active,QPalette::Background,Qt::gray);
+    p.setColor(QPalette::Inactive,QPalette::Background,Qt::gray);
+
+
+    mainedit.setAutoFillBackground(true);
+    mainedit.setBackgroundVisible(true);
+    mainedit.setBackgroundRole(QPalette::Base);
+    mainedit.setBackgroundRole(QPalette::Background);
+    mainedit.setPalette(p);
+    mainedit.setParent(this);
 
 }
 
