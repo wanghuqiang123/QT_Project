@@ -63,6 +63,7 @@ protected:
 public:
     static MainWindow* NewInstance();
     QToolBar* toolbar();
+    void openFile(QString path);
     ~MainWindow();
 private slots:
     void onFileOpen();

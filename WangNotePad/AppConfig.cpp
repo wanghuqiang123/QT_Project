@@ -8,9 +8,11 @@ AppConfig::AppConfig(QObject *parent) : QObject(parent)  //这个构造函数提
 }
 
 //这个构造函数提供保存状态的功能
-AppConfig::AppConfig(QFont font,bool isWrap,bool tbVisible,bool sbVisible,QObject *parentr)
+AppConfig::AppConfig(QFont font,QPoint point,QSize size,bool isWrap,bool tbVisible,bool sbVisible,QObject *parentr)
 {
     m_editorFont = font;
+    m_mainWindowpoint = point;
+    m_mainWindowsize = size;
     m_isAutoWrap = isWrap;
     m_isToolBarVisible = tbVisible;
     m_isStatusBarVisible = sbVisible;
@@ -28,7 +30,9 @@ bool AppConfig::restore()
 
         in.setVersion(QDataStream::Qt_5_9);        //指定Qt版本
 
-        in>>m_editorFont;                  //把每个变量的状态从配置文件中读出
+        in>>m_editorFont;   //把每个变量的状态从配置文件中读出
+        in>>m_mainWindowpoint;
+        in>>m_mainWindowsize;
         in>>m_isAutoWrap;
         in>>m_isToolBarVisible;
         in>>m_isStatusBarVisible;
@@ -54,6 +58,8 @@ bool AppConfig::store()
         out.setVersion(QDataStream::Qt_5_9);        //指定Qt版本
 
         out<<m_editorFont;                  //把每个变量的状态写入文件中保存
+        out<<m_mainWindowpoint;             //因为存储的时候按照顺序  因此要按着顺序来存储；
+        out<<m_mainWindowsize;
         out<<m_isAutoWrap;
         out<<m_isToolBarVisible;
         out<<m_isStatusBarVisible;
@@ -86,6 +92,16 @@ bool AppConfig::isStatusBarVisible()
 bool AppConfig::isValid()
 {
     return m_isValid;
+}
+
+QSize AppConfig::mainWindowsize()
+{
+    return m_mainWindowsize;
+}
+
+QPoint AppConfig::mainWindowpoint()
+{
+    return m_mainWindowpoint;
 }
 
 

@@ -1,5 +1,6 @@
 #include <QApplication>
 #include "MainWindow.h"
+#include <QFileInfo>
 
 int main(int argc, char *argv[])
 {
@@ -9,6 +10,16 @@ int main(int argc, char *argv[])
 
     if( w != NULL )
     {
+        if( argc>1 )
+        {
+            QFileInfo fi(argv[1]);
+
+            if(fi.exists())
+            {
+                //open the file on editor;
+                w->openFile(fi.absoluteFilePath());  //绝对路径
+            }
+        }
         w->show();
 
         ret = a.exec();

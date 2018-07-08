@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "AboutDialog.h"
+#include "AppConfig.h"
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
@@ -159,6 +160,16 @@ void MainWindow::onFileOpen()
     }
 
 }
+
+void MainWindow::openFile(QString path)    //此函数功能用于在点击文本时默认打开文本编辑器
+{
+    preEditorChange();
+    if(!m_isTextChange)
+    {
+        openFileToEditor(path);
+    }
+}
+
 //保存当前的文本内容数据
 QString MainWindow::saveCurrentData(QString path)
 {
@@ -188,6 +199,9 @@ QString MainWindow::saveCurrentData(QString path)
     }
     return ret;
 }
+
+
+
 //保存函数
 void MainWindow::onFileSave()
 {
@@ -221,6 +235,14 @@ void MainWindow::closeEvent(QCloseEvent* e)  //关闭程序时若未保存则询
     preEditorChange();
     if(!m_isTextChange)
     {
+        QFont font = mainedit.font();
+        bool isWrap = (mainedit.lineWrapMode() == QPlainTextEdit::WidgetWidth);
+        bool tbVisible = toolbar()->isVisible();
+        bool sb =   statusBar()->isVisible();
+        AppConfig config(font,pos(),size(),isWrap,tbVisible,sb);        //获得当前程序中的个状态参数 存入到配置文件中
+
+        config.store();
+
         QMainWindow::closeEvent(e);
     }
     else

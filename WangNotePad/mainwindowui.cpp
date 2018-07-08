@@ -59,6 +59,8 @@ bool MainWindow::construct()
             findMenuBarAction("Status Bar")->setChecked(false);
             findToolBarAction("Status Bar")->setChecked(false);
         }
+        move(config.mainWindowpoint());
+        resize(config.mainWindowsize());
     }
     return ret;
 }
@@ -644,13 +646,6 @@ QToolBar* MainWindow::toolbar()  //查找主窗口中的工具栏
 
 MainWindow::~MainWindow()
 {
-    QFont font = mainedit.font();
-    bool isWrap = (mainedit.lineWrapMode() == QPlainTextEdit::WidgetWidth);
-    bool tbVisible = (findMenuBarAction("Tool Bar")->isChecked());
-    bool sb = (findMenuBarAction("Status Bar")->isChecked() && findToolBarAction("Status Bar")->isChecked());
-    AppConfig config(font,isWrap,tbVisible,sb);
-
-    config.store();
 
 }
 
