@@ -239,7 +239,7 @@ void MainWindow::closeEvent(QCloseEvent* e)  //关闭程序时若未保存则询
         bool isWrap = (mainedit.lineWrapMode() == QPlainTextEdit::WidgetWidth);
         bool tbVisible = toolbar()->isVisible();
         bool sb =   statusBar()->isVisible();
-        AppConfig config(font,pos(),size(),isWrap,tbVisible,sb);        //获得当前程序中的个状态参数 存入到配置文件中
+        AppConfig config(font,pos(),size(),isWrap,tbVisible,sb,m_BackStyleSet);        //获得当前程序中的个状态参数 存入到配置文件中
 
         config.store();
 
@@ -498,6 +498,42 @@ void MainWindow::onHelpManual()
 void MainWindow::onBackStyleSet()
 {
 
+    if(!m_BackStyleSet)    //如果背景标志为假的  则可以用户点击的时候背景变成灰色  并且将标志位设置为false
+    {
+        QPalette p = mainedit.palette();
+        p.setColor(QPalette::Active,QPalette::Base,Qt::gray);
+        p.setColor(QPalette::Inactive,QPalette::Base,Qt::gray);     //Base用于设置的是窗口小部件的背景色   在这里是高亮行的背景色
+        p.setColor(QPalette::Active,QPalette::Background,Qt::gray);
+        p.setColor(QPalette::Inactive,QPalette::Background,Qt::gray);
+
+
+        mainedit.setAutoFillBackground(true);
+        mainedit.setBackgroundVisible(true);
+        mainedit.setBackgroundRole(QPalette::Base);
+        mainedit.setBackgroundRole(QPalette::Background);
+        mainedit.setPalette(p);
+        mainedit.setParent(this);
+
+        m_BackStyleSet = true;
+    }
+    else
+    {
+        QPalette p = mainedit.palette();
+        p.setColor(QPalette::Active,QPalette::Base,Qt::white);
+        p.setColor(QPalette::Inactive,QPalette::Base,Qt::white);     //Base用于设置的是窗口小部件的背景色   在这里是高亮行的背景色
+        p.setColor(QPalette::Active,QPalette::Background,Qt::white);
+        p.setColor(QPalette::Inactive,QPalette::Background,Qt::white);
+
+
+        mainedit.setAutoFillBackground(true);
+        mainedit.setBackgroundVisible(true);
+        mainedit.setBackgroundRole(QPalette::Base);
+        mainedit.setBackgroundRole(QPalette::Background);
+        mainedit.setPalette(p);
+        mainedit.setParent(this);
+
+        m_BackStyleSet = false;
+    }
 }
 
 

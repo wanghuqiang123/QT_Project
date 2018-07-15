@@ -59,6 +59,16 @@ bool MainWindow::construct()
             findMenuBarAction("Status Bar")->setChecked(false);
             findToolBarAction("Status Bar")->setChecked(false);
         }
+        if(!config.StyleSet())
+        {
+            findMenuBarAction("Dark style Set")->setChecked(false);
+        }
+        else
+        {
+            findMenuBarAction("Dark style Set")->setChecked(true);
+            onBackStyleSet();
+        }
+
         move(config.mainWindowpoint());
         resize(config.mainWindowsize());
     }
@@ -435,9 +445,10 @@ bool MainWindow::initSetMenu(QMenuBar *mb)
         }
 
         menu->addSeparator();
-        ret = ret && makeAction(action,menu,"Black style Set",0);
+        ret = ret && makeAction(action,menu,"Dark style Set",0);
         if(ret)
         {
+            connect(action,SIGNAL(triggered(bool)),this,SLOT(onBackStyleSet()));
             menu->addAction(action);
         }
     }

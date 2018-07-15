@@ -28,6 +28,8 @@ private:
     QSharedPointer<FindDialog>m_pfindDialog;
     QSharedPointer<ReplaceDialog>m_pReplaceDlg;
 
+    bool m_BackStyleSet;
+
     MainWindow();
     MainWindow(const MainWindow&);
     MainWindow& operator= (const MainWindow&);
