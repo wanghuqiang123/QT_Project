@@ -17,11 +17,12 @@ class AppConfig : public QObject
     bool m_isToolBarVisible;
     bool m_isStatusBarVisible;
     bool m_isValid;
+    bool m_StylsetVisible;
 
     bool restore();
 public:
     explicit AppConfig(QObject *parent = nullptr);
-    explicit AppConfig(QFont font,QPoint point,QSize size,bool isWrap,bool tbVisible,bool sbVisible,QObject *parent = nullptr);
+    explicit AppConfig(QFont font,QPoint point,QSize size,bool isWrap,bool tbVisible,bool sbVisible,bool StylsetVisible,QObject *parent = nullptr);
     bool store();
     QFont editorFont();
     bool isAutoWrap();
@@ -30,6 +31,7 @@ public:
     QSize mainWindowsize();
     QPoint mainWindowpoint();
     bool isValid();
+    bool StyleSet();
 };
 
 #endif // APPCONFIG_H

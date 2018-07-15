@@ -8,7 +8,7 @@ AppConfig::AppConfig(QObject *parent) : QObject(parent)  //这个构造函数提
 }
 
 //这个构造函数提供保存状态的功能
-AppConfig::AppConfig(QFont font,QPoint point,QSize size,bool isWrap,bool tbVisible,bool sbVisible,QObject *parentr)
+AppConfig::AppConfig(QFont font,QPoint point,QSize size,bool isWrap,bool tbVisible,bool sbVisible,bool StylsetVisible,QObject *parentr):QObject(parentr)
 {
     m_editorFont = font;
     m_mainWindowpoint = point;
@@ -16,6 +16,7 @@ AppConfig::AppConfig(QFont font,QPoint point,QSize size,bool isWrap,bool tbVisib
     m_isAutoWrap = isWrap;
     m_isToolBarVisible = tbVisible;
     m_isStatusBarVisible = sbVisible;
+    m_StylsetVisible = StylsetVisible;       //这里设置各个变量的状态
     m_isValid = true;
 }
 
@@ -36,6 +37,7 @@ bool AppConfig::restore()
         in>>m_isAutoWrap;
         in>>m_isToolBarVisible;
         in>>m_isStatusBarVisible;
+        in>>m_StylsetVisible;
 
         file.close();
     }
@@ -63,6 +65,7 @@ bool AppConfig::store()
         out<<m_isAutoWrap;
         out<<m_isToolBarVisible;
         out<<m_isStatusBarVisible;
+        out<<m_StylsetVisible;
 
         file.close();
     }
@@ -88,7 +91,10 @@ bool AppConfig::isStatusBarVisible()
 {
     return m_isStatusBarVisible;
 }
-
+bool AppConfig::StyleSet()
+{
+    return m_StylsetVisible;
+}
 bool AppConfig::isValid()
 {
     return m_isValid;

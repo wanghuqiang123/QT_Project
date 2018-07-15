@@ -59,6 +59,16 @@ bool MainWindow::construct()
             findMenuBarAction("Status Bar")->setChecked(false);
             findToolBarAction("Status Bar")->setChecked(false);
         }
+        if(!config.StyleSet())
+        {
+            findMenuBarAction("Dark style Set")->setChecked(false);
+        }
+        else
+        {
+            findMenuBarAction("Dark style Set")->setChecked(true);
+            onBackStyleSet();
+        }
+
         move(config.mainWindowpoint());
         resize(config.mainWindowsize());
     }
