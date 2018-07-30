@@ -13,6 +13,8 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QSharedPointer>
+#include <QTabWidget>
+#include <QVector>
 #include "FindDialog.h"
 #include "ReplaceDialog.h"
 
@@ -20,8 +22,12 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-private:
+protected:
+    QTabWidget m_tabwidget;
     QPlainTextEdit mainedit;
+    QVector<QPlainTextEdit*>v_mainedit;
+    int num;
+
     QLabel statusLbl;
     QString m_filepath;
     bool m_isTextChange;
@@ -35,10 +41,11 @@ private:
     MainWindow& operator= (const MainWindow&);
 
     bool construct();
+    bool initTabWidget();
     bool initMenuBar();
     bool initToolBar();
     bool initStatusBar();
-    bool initMainEditor();
+    bool initMainEditor(QString filename = "new");
     bool initFileMenu(QMenuBar* mb);
     bool initEditMenu(QMenuBar* mb);
     bool initFormatMenu(QMenuBar* mb);
@@ -62,18 +69,22 @@ protected:
     void closeEvent(QCloseEvent *);
     void dragEnterEvent(QDragEnterEvent *e);  //悬挂事件
     void dropEvent(QDropEvent *e);    //放下事件
+    void DeleteVector();
+    void openNewTab(QString filename = "new");
+    void removeEditPoint(int index);   //删除对应的vector中的下标号
 public:
     static MainWindow* NewInstance();
     QToolBar* toolbar();
     void openFile(QString path);
     ~MainWindow();
-private slots:
+protected slots:
     void onFileOpen();
     void onFileSave();
     void onFileSaveAs();
     void onTextChanged();
     void onFileNew();
     void onFilePrint();
+    void onCloseTab(int index);
     void onCopyAvailable(bool available);
     void onRedoAvailable(bool available);
     void onUndoAvailable(bool available);
@@ -90,6 +101,15 @@ private slots:
     void onFormatFont();
     void onFormatWrap();
     void onHelpManual();
+
+    //these slots functions is every m_tabwidget QPlainTextedit's slot ;
+    void onEditUndo();
+    void onEditRedo();
+    void onEditCopy();
+    void onEditCut();
+    void onEditPaste();
+    void onEditSelectAll();
+
 };
 
 #endif // MAINWINDOW_H

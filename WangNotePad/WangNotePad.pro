@@ -30,7 +30,8 @@ SOURCES += \
     main.cpp \
     ReplaceDialog.cpp \
     AboutDialog.cpp \
-    AppConfig.cpp
+    AppConfig.cpp \
+    mainwindowTabEditSlot.cpp
 
 HEADERS += \
         mainwindow.h \

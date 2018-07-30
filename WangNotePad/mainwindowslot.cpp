@@ -28,7 +28,7 @@
 //错误消息提示对话框
 void MainWindow::showErroeMessage(const QString message)
 {
-    QMessageBox msg(this);
+    QMessageBox msg(&m_tabwidget);
 
     msg.setWindowTitle("Error");
     msg.setText(message);
@@ -39,7 +39,7 @@ void MainWindow::showErroeMessage(const QString message)
 //询问对话框
  int MainWindow::showQueryMessage(QString Message)
  {
-     QMessageBox msg(this);
+     QMessageBox msg(&m_tabwidget);
 
      msg.setWindowTitle("Query");
      msg.setText(Message);
@@ -51,7 +51,7 @@ void MainWindow::showErroeMessage(const QString message)
 QString MainWindow::showFileDialog(QFileDialog::AcceptMode mode, QString title)
 {
     QString ret = "";
-    QFileDialog fd(this);       //在当前程序设置一个文件对话框
+    QFileDialog fd(&m_tabwidget);       //在当前程序设置一个文件对话框
     QStringList filters;        //filters文件的格式列表
     QMap<QString,QString>map;
     const char* filterArray[][2] =
@@ -117,10 +117,11 @@ void MainWindow::preEditorChange()
 
 void MainWindow::onFileNew()  //建立一个新的文件
 {
-    preEditorChange(); //检测当前文件是否更改，若更改没保存 ，可以保存
+//    preEditorChange(); //检测当前文件是否更改，若更改没保存 ，可以保存
     if(!m_isTextChange)
     {
-        mainedit.clear();
+        openNewTab();
+//        mainedit.clear();
         setWindowTitle("NotePad - [New]");
         m_filepath = "";
         m_isTextChange = false;
@@ -134,7 +135,9 @@ void MainWindow::openFileToEditor(QString path) //打开文件内容到编辑器
         QFile file(path);    //打开文件
         if(file.open(QIODevice::ReadOnly | QIODevice::Text))   //用只读和文本的方式打开
         {
-            mainedit.setPlainText(QString(file.readAll()));   //读取所有的内容到平面上
+            openNewTab(file.fileName());
+
+            v_mainedit[v_mainedit.size()-1]->setPlainText(QString(file.readAll()));   //读取所有的内容到平面上
             file.close();
 
             m_filepath = path;                             //设置当前编辑文件的文件的路径为path
@@ -230,19 +233,40 @@ void MainWindow::onTextChanged()
     m_isTextChange = true;
 }
 
+void MainWindow::onCloseTab(int index)
+{
+    preEditorChange();
+    if(!m_isTextChange)
+    {
+        if(m_tabwidget.count() == 1)
+        {
+            QFont font = mainedit.font();
+            bool isWrap = (mainedit.lineWrapMode() == QPlainTextEdit::WidgetWidth);
+            bool tbVisible = toolbar()->isVisible();
+            bool sb =   statusBar()->isVisible();
+            AppConfig config(font,pos(),size(),isWrap,tbVisible,sb,m_BackStyleSet);        //获得当前程序中的个状态参数 存入到配置文件中
+
+            config.store();
+        }
+        m_tabwidget.removeTab(index);  //移除选择的标签  index表示被移除的标签的下标号  从0开始； 移除这个标签并不能销毁标签中的对象以及分配的内存
+        removeEditPoint(index);    //这里是调用remove去掉QVector中的被删除的下标对应的元素   为指向编辑器的指针； 使其的下标号和TabWidget中的下标号和地址值相对应
+
+    }
+
+}
+
 void MainWindow::closeEvent(QCloseEvent* e)  //关闭程序时若未保存则询问是否保存当前内容
 {
     preEditorChange();
     if(!m_isTextChange)
     {
-        QFont font = mainedit.font();
-        bool isWrap = (mainedit.lineWrapMode() == QPlainTextEdit::WidgetWidth);
-        bool tbVisible = toolbar()->isVisible();
-        bool sb =   statusBar()->isVisible();
-        AppConfig config(font,pos(),size(),isWrap,tbVisible,sb,m_BackStyleSet);        //获得当前程序中的个状态参数 存入到配置文件中
+//        QFont font = mainedit.font();
+//        bool isWrap = (mainedit.lineWrapMode() == QPlainTextEdit::WidgetWidth);
+//        bool tbVisible = toolbar()->isVisible();
+//        bool sb =   statusBar()->isVisible();
+//        AppConfig config(font,pos(),size(),isWrap,tbVisible,sb,m_BackStyleSet);        //获得当前程序中的个状态参数 存入到配置文件中
 
-        config.store();
-
+//        config.store();
         QMainWindow::closeEvent(e);
     }
     else
@@ -353,7 +377,7 @@ QAction* MainWindow::findToolBarAction(QString text)   //列出子类查找与te
 
 void MainWindow::onFilePrint()
 {
-    QPrintDialog dlg(this);    //弹出打印对话框
+    QPrintDialog dlg(&m_tabwidget);    //弹出打印对话框
     dlg.setWindowTitle("Print");    //对话框标题
 
     if(dlg.exec() == QPrintDialog::Accepted)        //等待按下是否 选择是打印
@@ -415,7 +439,7 @@ void MainWindow::onReplace()
 void MainWindow::onEditGoto()
 {
     bool ok = false;
-    int ln = QInputDialog::getInt(this,"Goto","Line: ",1,1,mainedit.document()->lineCount(),1,&ok);
+    int ln = QInputDialog::getInt(&m_tabwidget,"Goto","Line: ",1,1,mainedit.document()->lineCount(),1,&ok);
     //从输入对话框中输入获取用户输入的整形值，
     if(ok)
     {
@@ -459,13 +483,13 @@ void MainWindow::onViewStatusbar()
 
 void MainWindow::onHelpAbout()
 {
-    AboutDialog(this).exec();
+    AboutDialog(&m_tabwidget).exec();
 }
 
 void MainWindow::onFormatFont()       //设置字体格式大小
 {
     bool ok = false;
-    QFont font = QFontDialog::getFont(&ok,mainedit.font(),this);
+    QFont font = QFontDialog::getFont(&ok,mainedit.font(),&m_tabwidget);
 
     if(ok)
     {
@@ -492,7 +516,7 @@ void MainWindow::onFormatWrap()   //换行转换
 }
 void MainWindow::onHelpManual()
 {
-    QDesktopServices::openUrl(QUrl("https://github.com/wanghuqiang123/QT_Project/tree/master/WangNotePad"));
+    QDesktopServices::openUrl(QUrl("https://github.com/wanghuqiang123/QT_Text_editor"));
 }
 
 void MainWindow::onBackStyleSet()
@@ -501,18 +525,21 @@ void MainWindow::onBackStyleSet()
     if(!m_BackStyleSet)    //如果背景标志为假的  则可以用户点击的时候背景变成灰色  并且将标志位设置为false
     {
         QPalette p = mainedit.palette();
-        p.setColor(QPalette::Active,QPalette::Base,Qt::gray);
-        p.setColor(QPalette::Inactive,QPalette::Base,Qt::gray);     //Base用于设置的是窗口小部件的背景色   在这里是高亮行的背景色
-        p.setColor(QPalette::Active,QPalette::Background,Qt::gray);
-        p.setColor(QPalette::Inactive,QPalette::Background,Qt::gray);
+        p.setColor(QPalette::Active,QPalette::Base,Qt::black);
+        p.setColor(QPalette::Inactive,QPalette::Base,Qt::black);     //Base用于设置的是窗口小部件的背景色   在这里是高亮行的背景色
+        p.setColor(QPalette::Active,QPalette::Background,Qt::black);
+        p.setColor(QPalette::Inactive,QPalette::Background,Qt::black);
+        p.setColor(QPalette::Active,QPalette::Text,Qt::gray);
+        p.setColor(QPalette::Inactive,QPalette::Text,Qt::gray);
 
 
         mainedit.setAutoFillBackground(true);
         mainedit.setBackgroundVisible(true);
         mainedit.setBackgroundRole(QPalette::Base);
         mainedit.setBackgroundRole(QPalette::Background);
+        mainedit.setBackgroundRole(QPalette::Text);
         mainedit.setPalette(p);
-        mainedit.setParent(this);
+        //mainedit.setParent(&m_tabwidget);
 
         m_BackStyleSet = true;
     }
@@ -523,14 +550,17 @@ void MainWindow::onBackStyleSet()
         p.setColor(QPalette::Inactive,QPalette::Base,Qt::white);     //Base用于设置的是窗口小部件的背景色   在这里是高亮行的背景色
         p.setColor(QPalette::Active,QPalette::Background,Qt::white);
         p.setColor(QPalette::Inactive,QPalette::Background,Qt::white);
+        p.setColor(QPalette::Active,QPalette::Text,Qt::black);
+        p.setColor(QPalette::Inactive,QPalette::Text,Qt::black);
 
 
         mainedit.setAutoFillBackground(true);
         mainedit.setBackgroundVisible(true);
         mainedit.setBackgroundRole(QPalette::Base);
         mainedit.setBackgroundRole(QPalette::Background);
+        mainedit.setBackgroundRole(QPalette::Text);
         mainedit.setPalette(p);
-        mainedit.setParent(this);
+        //mainedit.setParent(&m_tabwidget);
 
         m_BackStyleSet = false;
     }
