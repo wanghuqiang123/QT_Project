@@ -30,4 +30,5 @@ void MainWindow::removeEditPoint(int index)
 {
     delete v_mainedit[index];
     v_mainedit.remove(index);
+    m_isTextChange.remove(index);
 }

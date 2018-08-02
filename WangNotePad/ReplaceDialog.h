@@ -17,7 +17,7 @@ protected slots:
     void onReplaceCliked();
     void onReplaceAllCliked();
 public:
-    explicit ReplaceDialog(QWidget* parent = 0,QPlainTextEdit* pText = 0);
+    explicit ReplaceDialog(QWidget* parent = 0);
 
 };
 

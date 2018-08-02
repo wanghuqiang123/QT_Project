@@ -3,14 +3,14 @@
 #include <QTextCursor>
 #include <QMessageBox>
 
-FindDialog::FindDialog(QWidget *parent,QPlainTextEdit* pText) : QDialog(parent, Qt::WindowCloseButtonHint | Qt::Drawer)
+FindDialog::FindDialog(QWidget *parent) : QDialog(parent, Qt::WindowCloseButtonHint | Qt::Drawer)
 {
     initControl();
     connetSlot();
 
     setLayout(&m_layout);
     setWindowTitle("Find");
-    setPlainTextEdit(pText);
+//    setPlainTextEdit(pText);  //出现问题
 }
 
 

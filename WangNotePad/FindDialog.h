@@ -37,7 +37,7 @@ protected:
     void initControl();
     void connetSlot();
 public:
-    explicit FindDialog(QWidget* parent = 0,QPlainTextEdit* pText = 0);
+    explicit FindDialog(QWidget* parent = 0);
     void setPlainTextEdit(QPlainTextEdit* pText);
     QPlainTextEdit* getPlainTextEdit();
     bool event(QEvent* evt);

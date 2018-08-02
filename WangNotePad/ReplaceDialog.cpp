@@ -1,6 +1,6 @@
 #include "ReplaceDialog.h"
 
-ReplaceDialog::ReplaceDialog(QWidget* parent,QPlainTextEdit* pText):FindDialog(parent,pText)
+ReplaceDialog::ReplaceDialog(QWidget* parent):FindDialog(parent)
 {
     initControl();
     connetSlot();
