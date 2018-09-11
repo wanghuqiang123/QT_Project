@@ -121,7 +121,8 @@ void MainWindow::preEditorChange(int index)
 
 void MainWindow::onFileNew()  //建立一个新的文件
 {
-        openNewTab();
+        QString Tabnum = QString::number(v_mainedit.count()+1);
+        openNewTab("New "+ Tabnum);
         setWindowTitle("NotePad - [New]");
         m_filepath = "";
 
@@ -137,6 +138,10 @@ void MainWindow::openFileToEditor(QString path) //打开文件内容到编辑器
             openNewTab(file.fileName());
 
             v_mainedit[v_mainedit.size()-1]->setPlainText(QString(file.readAll()));   //读取所有的内容到平面上
+            m_isTextChange[m_tabwidget.currentIndex()] = false; //此语句的作用是上句语句将文本打印在平面编辑器上时调用了onTextChange，将标志设置为了true;
+
+            setSavename(v_mainedit.size()-1,file.fileName());
+
             file.close();
 
             m_filepath = path;                             //设置当前编辑文件的文件的路径为path
@@ -202,6 +207,7 @@ void MainWindow::onFileSave()
     if(path != "")
     {
         m_filepath = path;
+        setSavename(m_tabwidget.currentIndex(),path);
     }
 }
 //另存为的函数
@@ -211,16 +217,18 @@ void MainWindow::onFileSaveAs()
     if(path != "")
     {
         m_filepath = path;
+        setSavename(m_tabwidget.currentIndex(),path);
     }
 }
 //当文本编辑器中的内容发生变化时触发此函数。
 void MainWindow::onTextChanged()
 {
-    if(!m_isTextChange[m_tabwidget.currentIndex()])
+    if(!m_isTextChange[m_tabwidget.currentIndex()])  //
     {
         setWindowTitle("Editing..."+windowTitle());
+        m_isTextChange[m_tabwidget.currentIndex()] = true;
     }
-    m_isTextChange[m_tabwidget.currentIndex()] = true;
+
 }
 
 void MainWindow::onCloseTab(int index)
@@ -245,25 +253,13 @@ void MainWindow::onCloseTab(int index)
 
 void MainWindow::closeEvent(QCloseEvent* e)  //关闭程序时若未保存则询问是否保存当前内容
 {
-
-    for(int i = 0;i<m_tabwidget.count();i++)
-        if(m_isTextChange[i])
-        {
-            preEditorChange(i);
-        }
+    while(m_tabwidget.count() != 0 && isClose != true)
+    {
+        onCloseTab(m_tabwidget.count()-1);
+    }
 
     if(!isClose)
     {
-        if(m_tabwidget.count() != 0)    //如何关闭前有更多的标签页  则保存当前的标签页的状态
-        {
-            QFont font = v_mainedit[m_tabwidget.currentIndex()]->font();
-            bool isWrap = (v_mainedit[m_tabwidget.currentIndex()]->lineWrapMode() == QPlainTextEdit::WidgetWidth);
-            bool tbVisible = toolbar()->isVisible();
-            bool sb = statusBar()->isVisible();
-            AppConfig config(font,pos(),size(),isWrap,tbVisible,sb,m_BackStyleSet);        //获得当前程序中的个状态参数 存入到配置文件中
-
-            config.store();
-        }
         QMainWindow::closeEvent(e);
 
     }
@@ -271,6 +267,7 @@ void MainWindow::closeEvent(QCloseEvent* e)  //关闭程序时若未保存则询
     {
         e->ignore();
     }
+    isClose = false;
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *e) // 拖放事件处理；
@@ -388,25 +385,27 @@ void MainWindow::onFilePrint()
 
 void MainWindow::onCursorPositiongChanged()         //在状态栏显示当前的光标位置
 {
-    int pos = v_mainedit[m_tabwidget.currentIndex()]->textCursor().position();  //在文本编辑框中光标所在的字符位置；
-    QString text = v_mainedit[m_tabwidget.currentIndex()]->toPlainText();      //获取当前编辑器的文本内容；
-    int col = 0;          //列
-    int line = 1;         //行
-    int flag = -1;
-
-    for(int i = 0;i<pos;i++)
+    if(m_tabwidget.count() != 0)
     {
-        if(text[i] == '\n')
+        int pos = v_mainedit[m_tabwidget.currentIndex()]->textCursor().position();  //在文本编辑框中光标所在的字符位置；
+        QString text = v_mainedit[m_tabwidget.currentIndex()]->toPlainText();      //获取当前编辑器的文本内容；
+        int col = 0;          //列
+        int line = 1;         //行
+        int flag = -1;
+
+        for(int i = 0;i<pos;i++)
         {
-            line++;
-            flag = i;
+            if(text[i] == '\n')
+            {
+                line++;
+                flag = i;
+            }
         }
+        flag++;
+        col = pos-flag;     //flag表示上一行的所有字符数目。
+
+        statusLbl.setText("Ln: "+QString::number(line)+"   col: "+QString::number(col));
     }
-    flag++;
-    col = pos-flag;     //flag表示上一行的所有字符数目。
-
-    statusLbl.setText("Ln: "+QString::number(line)+"   col: "+QString::number(col));
-
 }
 
 void MainWindow::onEditDelete()
@@ -588,5 +587,12 @@ void MainWindow::onBackStyleSet()
     }
 }
 
+QString MainWindow::getFilename(const QString path)
+{
+    QString ret = path;
+    QStringList list = ret.split("/",QString::SkipEmptyParts);
 
+    ret = list.back();
+    return ret;
+}
 

@@ -46,7 +46,7 @@ protected:
     bool initMenuBar();
     bool initToolBar();
     bool initStatusBar();
-    bool initMainEditor(QString filename = "new");
+    bool initMainEditor(QString filename);
     bool initFileMenu(QMenuBar* mb);
     bool initEditMenu(QMenuBar* mb);
     bool initFormatMenu(QMenuBar* mb);
@@ -57,6 +57,8 @@ protected:
     bool makeAction(QAction*& action,QWidget* parent, QString text, int key);
     bool makeAction(QAction*& action,QWidget* parent, QString tip, QString icon);
 
+    void setSavename(int index,QString path);
+    QString getFilename(QString path);
     //member function
     int showQueryMessage(QString Message);
     QString showFileDialog(QFileDialog::AcceptMode mode,QString title);

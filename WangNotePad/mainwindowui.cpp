@@ -128,7 +128,7 @@ bool MainWindow::initTabWidget()
     m_tabwidget.setTabsClosable(true);
 
     connect(&m_tabwidget,SIGNAL(tabCloseRequested(int)),this,SLOT(onCloseTab(int)));  //if close this tabwidget,call slot onclosetab() function;
-
+    connect(&m_tabwidget,SIGNAL(currentChanged(int)),this,SLOT(onCursorPositiongChanged()));//当切换页面组件切换当前页面时。
     return ret;
 }
 
@@ -141,7 +141,7 @@ bool MainWindow::initMainEditor(QString filename)
     int n = v_mainedit.size();   //this n record assigned how many QPlainTextEdit in Qvector
     v_mainedit[n-1] = new QPlainTextEdit();
 
-    m_isTextChange.resize(n);
+    m_isTextChange.resize(n);  //从新分配空间，与标签数量保持一致，并且一一对应。
     m_isTextChange[n-1] = false;
 
     QPalette p = v_mainedit[n-1]->palette();
@@ -686,6 +686,7 @@ void MainWindow::openNewTab(QString filename)
 {
         initMainEditor(filename);
          onBackStyleSetNew();
+
 }
 
 void MainWindow::DeleteVector()  //删除QVector中的指向堆中分配的指针
@@ -693,6 +694,12 @@ void MainWindow::DeleteVector()  //删除QVector中的指向堆中分配的指�
     int size = v_mainedit.size();
     for(int i = 0;i<size;i++)
         delete v_mainedit[i];
+}
+
+void MainWindow::setSavename(int index,QString path)  //此函数是给保存后的文件在其标签上命名所保存的名字；
+{
+    QString filename = getFilename(path);
+    m_tabwidget.setTabText(index,filename);
 }
 
 MainWindow::~MainWindow()
